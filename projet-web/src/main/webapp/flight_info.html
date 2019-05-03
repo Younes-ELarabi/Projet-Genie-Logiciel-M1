@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script
+	src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+<script type="text/javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.js"></script>
+<script type="text/javascript" charset="utf8"
+	src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+<script type="text/javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/af.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<head>
+<title>FLight Details</title>
+<link rel="stylesheet" href="basic.css">
+</head>
+
+<body>
+	<header>
+		<div class="wrapper">
+			<div class="logo">
+				<img src="images/logo.png">
+				<ul class="nav-area">
+					<li><a href="home.html">Home</a></li>
+					<li><a href="search.html">Search Flight</a></li>
+					<li id='sigh'><a href="login.html">Login</a></li>
+					<li><a href="my_compte.html">Account</a></li>
+					<li id='deconnection'><button>Disconnect</button></li>
+
+				</ul>
+			</div>
+
+		</div>
+	</header>
+
+
+</body>
+<div id="search-box">
+	<br /> <br /> <br />
+	<p id='flight_id'></p>
+	<br />
+	<p id='depart_location'></p>
+	<br />
+	<p id='arriv_location'></p>
+	<br />
+	<p id='depart_date'></p>
+	<br />
+	<p id='depart_time'></p>
+	<br />
+	<p id='duree'></p>
+	<br />
+	<p id='plane'></p>
+	<br />
+	<p id='pilot'></p>
+	<br />
+	<p id='price'></p>
+	<br />
+	<p id='seat'></p>
+	<br /> <br /> <br /> <input id="nbseat" type="text"
+		placeholder="how many seats do you want?" size=33px /> <br /> <br />
+	<br />
+	<button id='book'>Book This Flight</button>
+	<br /> <br /> <br />
+
+</div>
+
+<script>
+
+$(document).ready(function () {
+	var username=sessionStorage.getItem('username');
+    var role=sessionStorage.getItem('status_login');
+    if(role!=null&&role!="null"){
+    	$("#sigh").hide();
+    	$('#deconnection').show();
+    	$('#welcome').html("Welcome "+username);
+    }else{
+    	$("#sigh").show();
+    	$('#deconnection').hide();
+    }
+    $('#deconnection').click(function () {
+    	sessionStorage.setItem('status_login',null);
+		sessionStorage.setItem('username',null);
+		location.href='home.html';
+    })
+});
+
+
+$(document).ready(function () {
+	
+	var id=sessionStorage.getItem('flight_id');
+	
+	  $.ajax({
+		  type: "get",
+		  data:{
+         	 'flight_id': id,
+          },
+         // content-type: "application/json",
+          dataType: "json",
+          url: 'http://localhost:8080/ws/service/getFlight/'+id,
+          success: function (data) {
+        	  console.log(data.id);
+        	  console.log("departure "+data.departureDate);
+        	  console.log("departure "+data.departureAirport.location);
+        	  console.log("departure "+data.arrivalAirport.location);
+	          var deairport=data.departureAirport;
+	          var araiport=data.arrivalAirport;
+	          var plane=data.plane;
+	          var pilot=data.pilot;
+        	  $('#flight_id').html("Flight ID : "+data.id +"\n");
+        	  $('#depart_location').html("Departure Location : "+deairport.location+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspDeparture Airport : "+deairport.name+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspICAO Code : "+deairport.icaoCode);
+        	  $('#arriv_location').html("Arrival Location : "+araiport.location+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspArrival airport : "+araiport.name+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspICAO Code : "+araiport.icaoCode);
+        	  $('#depart_date').html("Departure Date : "+data.departureDate);
+        	  $('#depart_time').html("Departure Time : "+data.departureTime);
+        	  $('#duree').html("Period : "+data.duree);
+        	  $('#plane').html("Plane ID : "+plane.id+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspPlane Model : "+plane.model);
+        	  $('#pilot').html("Pilot Name: "+pilot.name+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspPilot Experience : "+pilot.experience+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspPilot Qualification : "+pilot.qualification );
+        	  $('#price').html("Price (euros): "+data.price);
+        	  $('#seat').html("Available Seats : "+data.availableSeat);
+        	  var flight_booked=data;
+        	  $('#book').click(function () {
+        		  var status=sessionStorage.getItem('status_login');
+        		  var randomID=Math.floor(((Math.random() * 10000)/3 + 12)*2.31);
+        		  console.log(status);
+        		  if(status=="passenger"){
+        			  var nb = $('#nbseat').val();
+          		      console.log(nb);
+          		      if(nb>data.availableSeat||nb==null||nb==0){
+          		    	  alert("seat number not available.");  
+          		      }else{
+          		    	alert(" reservaion saved! we have sent an email to the pilot and please wait for his answer.");
+                        //update the flight
+                       $.ajax({
+									type : "GET",
+									dataType : "json",
+									url : 'http://localhost:8080/ws/service/getPassengerAccountInfo',
+									success : function(data) {
+										console.log(data);
+										if (data != null) {
+											var passenger=data;
+											
+											 var reservation={
+													 'id':randomID,
+					             	                 'flight': flight_booked,
+					             	                 'passenger': passenger,
+					             	              	 'nbseat': nb
+											} 
+											console.log(reservation);
+											console.log(JSON.stringify(reservation));
+						                       $.ajax({
+						                            type:"put",
+						                            url:"http://localhost:8080/ws/service/addReservation/",
+						                            dataType:'json',
+						       	                 	contentType:'application/json',
+						                            data: JSON.stringify(reservation),
+						                            success : function(data){
+						                            	
+						                                alert("Flight updated !");
+						                                location.href='my_compte.html';
+						                            },
+						                            error : function(error){
+						                                console.log('error');
+
+						                            }
+						                        })
+						                        //
+						          		    	//location.href='home.html';
+										}
+											 
+									},
+									error : function(error) {
+		                                console.log(error);
+									}
+								})      
+          		      }
+        		  }else if (status=="pilot"){
+        			  alert(" You are a pilot, please login as passengers to book this flight.");
+         			  location.href='home.html';
+         		  }
+        		  else{
+        			  alert("please login as passengers to book this flight.");
+        			 location.href='login.html';
+        		  }
+        	})
+          },
+        	error:function(error){
+          	}
+         })  
+});
+    
+
+</script>
+
+
+<style>
+button {
+	margin-bottom: 20px;
+	width: 220px;
+	height: 36px;
+	border: none;
+	border-radius: 2px;
+	color: #000;
+	font-family: sans-serif;
+	font-size: 15px;
+	font-weight: 1000;
+	transition: 0.2s ease;
+	cursor: pointer;
+}
+
+#search-box {
+	background : url(images/plane.jpg);
+	background-size: 100% 100%;
+	color:black;
+	font-weight:bold;
+	position: absolute;
+	top: 10%;
+	left: 10%;
+	background-color: #ffefe9;
+	width: 80%;
+	height: auto;
+	opacity: 0.8;
+}
+
+.table {
+	width: 50%;
+	text-align: center;
+}
+
+p {
+	font-size: 20px;
+	text-align: center;
+}
+.nav-area {
+    float: right;
+    list-style: none;
+    margin-top: 30px;
+    transform: translate(0%,0%);
+}
+#book {
+	padding: 10px 15px;
+	color: whitesmoke;
+	background-color: #d2954c;
+	font-size: large;
+	font-weight: bold;
+}
+
+#nbseat {
+	font-size: 20px;
+	background-color: bisque;
+}
+</style>
+</html>
+
+

@@ -1,0 +1,118 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.example</groupId>
+	<artifactId>WEB-PROJECT</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	
+	<properties>
+  		<elasticsearch.version>6.1.2</elasticsearch.version>
+  		<jackson.version>2.9.4</jackson.version>
+  		<java.version>1.8</java.version>
+	</properties>
+
+	<dependencies>
+
+		<!-- Jetty -->
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>9.2.14.v20151106</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlet</artifactId>
+			<version>9.2.14.v20151106</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-security</artifactId>
+			<version>9.2.14.v20151106</version>
+		</dependency>
+	
+		<!-- Jersey -->
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-server</artifactId>
+			<version>2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-common</artifactId>
+			<version>2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet-core</artifactId>
+			<version>2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-json-jackson</artifactId>
+			<version>2.3</version>
+		</dependency>
+		
+  		<dependency>
+   			<groupId>org.elasticsearch</groupId>
+    		<artifactId>elasticsearch</artifactId>
+    		<version>${elasticsearch.version}</version>
+  		</dependency>
+ 
+  		<dependency>
+   			<groupId>org.elasticsearch.client</groupId>
+    		<artifactId>elasticsearch-rest-high-level-client</artifactId>
+    		<version>${elasticsearch.version}</version>
+  		</dependency>
+ 
+  		<dependency>
+   			 <groupId>com.fasterxml.jackson.core</groupId>
+    		<artifactId>jackson-databind</artifactId>
+    		<version>${jackson.version}</version>
+  		</dependency>
+ 
+  		<dependency>
+   			 <groupId>com.fasterxml.jackson.core</groupId>
+    		<artifactId>jackson-core</artifactId>
+    		<version>${jackson.version}</version>
+  		</dependency>
+ 
+  		<dependency>
+    		<groupId>junit</groupId>
+    		<artifactId>junit</artifactId>
+    		<version>3.8.1</version>
+    		<scope>test</scope>
+  		</dependency>
+		<!-- high client -->
+		<dependency>
+    		<groupId>org.apache.logging.log4j</groupId>
+    		<artifactId>log4j-core</artifactId>
+    	<version>2.11.1</version>
+		</dependency>
+		<!-- JWT  -->
+		<dependency>
+    		<groupId>io.jsonwebtoken</groupId>
+    		<artifactId>jjwt-api</artifactId>
+    	<version>0.10.5</version>
+		</dependency>
+		<dependency>
+    		<groupId>io.jsonwebtoken</groupId>
+    		<artifactId>jjwt-impl</artifactId>
+    		<version>0.10.5</version>
+    		<scope>runtime</scope>
+		</dependency>
+		<dependency>
+    		<groupId>io.jsonwebtoken</groupId>
+    		<artifactId>jjwt-jackson</artifactId>
+    		<version>0.10.5</version>
+    	<scope>runtime</scope>
+		</dependency>
+		<!-- Mail -->
+		<dependency>
+    		<groupId>javax.mail</groupId>
+   			<artifactId>mail</artifactId>
+    	<version>1.4</version>
+		</dependency>
+		
+
+	</dependencies>
+
+</project>

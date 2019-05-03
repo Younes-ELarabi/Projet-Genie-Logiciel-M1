@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Up</title>   
+    <link rel="stylesheet" type="text/css" href="basic.css">
+</head>
+<body>
+    <header>
+        <div class="wrapper">
+            <div class="logo">
+                <img src="images/logo.png">
+            </div>
+            <ul class ="nav-area">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="search.html">Search Flight</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="my_compte.html">Account</a></li>
+            </ul>
+        </div>
+    </header>
+    <div id="login-box">
+      <div class="left-box">
+        <h1> Sign Up</h1>
+          <form id="form">
+            <input type="checkbox" name="Pilot" class="check" required="required"><label for="Pilot">Pilot</label>
+            <input type="checkbox" name="Passenger" class="check" required="required"><label for="scales">Passenger</label>
+            <input type="text" name="userName" id="userName" placeholder="userName" required="required" />
+            <input type="email" name="email" id="email" placeholder="E-mail" required="required"/>
+            <input type="date" name="birthDate" placeHolder="birthday required="required/>
+            <input type="password" name="passWord" id="passWord" placeholder="Password"required="required"/>
+            <input type="password" name ="passWord"id="repassWord" placeholder="Retype password"required="required"/>
+          </form>
+          <input type="submit" id="submit" value="submit"/>
+        </div>
+        <div class="right-box">
+          <span class="signinwith">Sign in with<br/>Social Network </span>
+        
+        <button class="social facebook">Log in with Facebook</button>    
+        <button class="social twitter">Log in with Twitter</button> 
+        <button class="social google">Log in with Google+</button> 
+        </div>
+        <div class="or">OR</div>
+    </div>
+    <script>
+            $(document).ready(function(){
+                $('.check').click(function() {
+                    $('.check').not(this).prop('checked', false);
+                });
+            });
+    </script>
+    <script>
+        $(document).ready(function () {
+            function ConvertFormToJSON(form){
+            var array = jQuery(form).serializeArray();
+            console.log(array);
+    	    var json = {};
+            var n = array.length;
+            console.log("taille :"+n);
+    	    jQuery.each(array, function() {
+                json[this.name] = this.value;
+            });
+        return json;
+        }
+        $('#submit').click(function () {
+                var json = ConvertFormToJSON($('#form'));
+                var dataj = JSON.stringify(json);
+                var password=$('#passWord').val();
+                var repassword=$('#repassWord').val();
+                console.log(password);
+                console.log(repassword);
+                if(password!=repassword){
+                	alert("please check your password again, they don't match!");	
+                }else{
+                	 $.ajax({
+                         url: 'http://localhost:8080/ws/service/createAccount',
+                         method: 'POST',
+                         data: dataj,
+                         contentType: "application/json; charset=utf-8",
+                         success: function () {
+                             alert('Saved successfully!');
+                             location.href='login.html';
+                         },
+                         error: function (error) {
+                           alert("username is already used !");
+                           location.reload();
+                         }
+                     })  
+                }    
+             })
+        });  
+    </script>
+    <style>
+        #login-box
+{
+    position: absolute;
+    margin: 15% 30%;
+    height: 400px;
+    width: 600px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.left-box
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    padding: 40px;
+    width: 300px;
+    height: 600px;    
+}
+
+h1
+{
+    margin: 0 0 20px 0;
+    font-weight: 300;
+    font-size: 28px;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="date"],
+input[type="email"]
+{
+    display: block;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    padding: 4px;
+    width: 220px;
+    height: 32px;
+    border: none;
+    outline: none;
+    border-bottom: 1px solid #aaa;
+    font-family: sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    transition: 0.2s ease;
+}
+.nav-area {
+    float: right;
+    list-style: none;
+    margin-top: 30px;
+    transform: translate(0%,0%);
+}
+
+input[type="submit"]
+{
+    margin-bottom: 28px;
+    width: 120px;
+    height: 32px;
+    background: #f44336;
+    border: none;
+    border-radius: 2px;
+    color: #fff;
+    font-family: sans-serif;
+    font-weight: 500;
+    text-transform: uppercase;
+    transition: 0.2s ease;
+    cursor: pointer;
+    
+}
+
+input[type="submit"]:hover,
+input[type="submit"]:focus
+{
+    background: #ff5722;
+    transition: 0.2s ease;
+}
+
+.right-box
+{
+    position: absolute;
+    top: 0;
+    right: 0;
+    box-sizing: border-box;
+    padding: 40px;
+    width: 300px;
+    height: 400px;
+    background-image: url(images/image1.jpg);
+    background-size: cover;
+    background-position: center;
+}
+
+.or
+{
+    position: absolute;
+    top: 180px;
+    left: 280px;
+    width: 40px;
+    height: 40px;
+    background: #efefef;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    line-height: 40px;
+    text-align: center;
+}
+
+.right-box .signinwith
+{
+    display: block;
+    margin-bottom: 40px;
+    font-size: 28px;
+    color: #fff;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+
+button.social
+{
+    margin-bottom: 20px;
+    width: 220px;
+    height: 36px;
+    border: none;
+    border-radius: 2px;
+    color: #fff;
+    font-family: sans-serif;
+    font-weight: 500;
+    transition: 0.2s ease;
+    cursor: pointer;
+}
+
+
+
+.facebook
+{
+    background: #32508e;
+}
+.twitter
+{
+    background: #55acee;
+}
+.google
+{
+    background: #dd4b39;
+}
+    </style>
+    
+</body>    
+</html>
