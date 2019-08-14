@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script
+	src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+<script type="text/javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.js"></script>
+<script type="text/javascript" charset="utf8"
+	src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+<script type="text/javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/af.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Search</title>
+<link rel="stylesheet" href="basic.css">
+</head>
+<body>
+		<header>
+				<div class="wrapper">
+					<div class="logo">
+						<img src="images/logo.png">
+					</div>
+					<ul class ="nav-area">
+						<li><a href="home.html">Home</a></li>
+						<li><a href="search.html">Search Flight</a></li>
+						<li id='sigh'><a href="login.html">Login</a></li>
+						<li><a href="my_compte.html">Account</a></li>
+						<li id='deconnection'><button>Disconnect</button></li>
+						
+					</ul>
+				</div>
+			</header>
+
+	<div class="info-box">
+			<form>
+			<fieldset>
+			<legend><span class="number">1</span> Flight informations</legend>
+			<input type="text" id="plane"placeholder="plan model   ex: BOEING 747" /> 
+			<input type="text" id="departure_airport"placeholder="departure airport name   ex: Orly" />
+			<input type="text" id="departure_location" placeholder="departure location    ex:Paris" />
+			<input type="text" id="departure_code" placeholder="departure Airport ICAO Code   ex: SID99" /> 
+			<input type="date" id="departure_date" placeholder="departure date " /> 
+			<input type="text" id="departure_time" placeholder="departure time  ex: 12:20" /> 
+			<input type="text" id="duree" placeholder="flight duration   ex: 3h" /> 
+			<input type="text" id="arrival_airport" placeholder="arrival airport name:  ex: Airport Marseille" /> 
+			<input type="text" id="arrival_location"placeholder="arrival location   ex:Marseille "/> 
+			<input type="text" id="arrival_code" placeholder="arrival Airport ICAO Code   ex: JFD0990" /> 
+			<input type="text" id="price" placeholder="price (euros)   ex:330" /> 
+			<input type="text" id="available_seats" placeholder="available_seats   ex:122" /> 
+			<input type="button" class="add" value="publish your flight" />
+			</form>
+			</fieldset>
+		</div>
+
+</body>
+<script>
+$(document).ready(function () {
+		var username=sessionStorage.getItem('username');
+    $('.add').click(function () {
+    	  var plane = $('#plane').val();
+    	  var pilot = username;
+            var departure_airport = $('#departure_airport').val();
+            var departure_location = $('#departure_location').val();
+            var departure_code = $('#departure_code').val();
+            var departure_date = $('#departure_date').val();
+            var departure_time = $('#departure_time').val();
+            var duree = $('#duree').val();
+            var arrival_airport = $('#arrival_airport').val();
+            var arrival_location = $('#arrival_location').val();
+            var arrival_code = $('#arrival_code').val();
+            var price = $('#price').val();
+            var available_seats = $('#available_seats').val();
+            var randomID=Math.floor(((Math.random() * 10000)/3 + 12)*2.31);
+            console.log(plane);
+            console.log(pilot);
+            console.log(departure_airport);
+            console.log(departure_date);
+            console.log(departure_time);
+            console.log(duree);
+            console.log(arrival_airport);
+            console.log(price);
+            console.log(available_seats);
+            
+            $.ajax({
+  			  type: "get",
+  			  pilotdata:{
+  	         	 'pilot_username': username.trim(),
+  	          },
+  	          dataType: "json",
+  	          url: 'http://localhost:8080/ws/service/getPilot/'+username.trim(),
+  	          success: function (pilotdata) {
+  	        	 pilot=pilotdata;
+  	        	 console.log(pilot);
+  	        	 var flight={
+  	        			 'id':randomID,
+  	                 'plane': plane,
+  	                 'pilot': pilot,
+  	              	 'departureAirport': {
+  	              		'name': departure_airport,
+  	              		'icaoCode': departure_code,
+  	              		'location':	departure_location
+  	              },
+  	              	 'departureDate': departure_date,
+  	              	 'departureTime': departure_time,
+  	              	 'duree': duree,
+  	              	 'arrivalAirport': {
+  	              		'name': arrival_airport,
+  	              		'icaoCode': arrival_code,
+  	              		'location':	arrival_location
+  	              },
+  	              	 'price': price,
+  	              	 'availableSeat': available_seats,	
+  	              	 
+  	               }
+  	              console.log(JSON.stringify(flight));
+  	              
+  	               $.ajax({
+  	                   url: 'http://localhost:8080/ws/service/addFlight',
+  	                   method: 'PUT',
+  	                   dataType:'json',
+  	                   contentType:'application/json',
+  	                   data:JSON.stringify(flight),
+  	                   success: function (data) {
+  	                	  console.log(data);
+  	                	 alert("Your new flight has been published successfully.");
+  	                	 location.href='my_compte.html';
+  	                	 
+  	                },
+  	                   error: function (error) {
+  	                       alert("Opps, no valide information, please try again.");
+  	                   }
+  	               });
+  	          },
+  	         error:function(error){
+  	          } 	         
+			})
+            
+            
+            
+           
+    });  
+})
+
+function detail(id){
+	sessionStorage.setItem('flight_id',id);
+	window.open('flight_info.html');
+  
+}
+function backcompte(){
+	location.replace("my_compte.html");
+}
+</script>
+
+
+<style>
+ .info-box{
+            max-width: 500px;
+            padding: 10px 20px;
+            background: #f4f7f8;
+            margin: 10px auto;
+            padding: 20px;
+            background: #f4f7f8;
+            border-radius: 8px;
+            font-family: Georgia, "Times New Roman", Times, serif;
+            transform: translate(0%,15%);
+        }
+        .info-box fieldset{
+            border: none;
+        }
+        .info-box legend {
+            font-size: 1.4em;
+            margin-bottom: 10px;
+        }
+        .info-box label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        .info-box input[type="text"],
+        .info-box input[type="date"],
+        .info-box input[type="datetime"],
+        .info-box input[type="email"],
+        .info-box input[type="number"],
+        .info-box input[type="password"],
+        .info-box input[type="search"],
+        .info-box input[type="time"],
+        .info-box input[type="url"],
+        .info-box textarea,
+        .info-box select {
+            font-family: Georgia, "Times New Roman", Times, serif;
+            background: rgba(255,255,255,.1);
+            border: none;
+            border-radius: 4px;
+            font-size: 15px;
+            margin: 0;
+            outline: 0;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box; 
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box; 
+            background-color: #e8eeef;
+            color:#8a97a0;
+            -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.03) inset;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.03) inset;
+            margin-bottom: 30px;
+        }
+        .info-box input[type="text"]:focus,
+        .info-box input[type="date"]:focus,
+        .info-box input[type="datetime"]:focus,
+        .info-box input[type="email"]:focus,
+        .info-box input[type="number"]:focus,
+        .info-box input[type="search"]:focus,
+        .info-box input[type="time"]:focus,
+        .info-box input[type="url"]:focus,
+        .info-box textarea:focus,
+        .info-box select:focus{
+            background: #d2d9dd;
+        }
+        .info-box select{
+            -webkit-appearance: menulist-button;
+            height:35px;
+        }
+        .info-box .number {
+            background: #1a96bc;
+            color: #fff;
+            height: 30px;
+            width: 30px;
+            display: inline-block;
+            font-size: 0.8em;
+            margin-right: 4px;
+            line-height: 30px;
+            text-align: center;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.2);
+            border-radius: 15px 15px 15px 0px;
+        }
+        
+        .info-box input[type="submit"],
+        .info-box input[type="button"]
+        {
+            position: relative;
+            display: block;
+            padding: 19px 39px 18px 39px;
+            color: #FFF;
+            margin: 0 auto;
+            background: #1a96bc;
+            font-size: 18px;
+            text-align: center;
+            font-style: normal;
+            width: 100%;
+            border: 1px solid #1a96bc;
+            border-width: 1px 1px 3px;
+            margin-bottom: 10px;
+        }
+        .info-box input[type="submit"]:hover,
+        .info-box input[type="button"]:hover
+        {
+            background: #8b91e9;
+        }
+
+button.trip {
+	margin-bottom: 20px;
+	width: 220px;
+	height: 36px;
+	border: none;
+	border-radius: 2px;
+	color: #fff;
+	font-family: sans-serif;
+	font-weight: 500;
+	transition: 0.2s ease;
+	cursor: pointer;
+}
+
+.dataTables_wrapper {
+	position: relative;
+	clear: both;
+	*zoom: 1;
+	zoom: 1;
+	top: 80px;
+	width: 65%;
+	left: 250px;
+}
+
+button, input {
+	border: none;
+	outline: 0;
+	display: inline-block;
+	padding: 8px;
+	color: white;
+	background-color: skyblue;
+	text-align: center;
+	cursor: pointer;
+	width: 100%;
+	font-size: 18px;
+}
+
+a {
+	text-decoration: none;
+	font-size: 22px;
+	color: black;
+}
+
+.nav-area {
+    float: right;
+    list-style: none;
+    margin-top: 30px;
+    transform: translate(0%,0%);
+}
+button:hover, a:hover {
+	opacity: 0.7;
+}
+</style>
+</html>

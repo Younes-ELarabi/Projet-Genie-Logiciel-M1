@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.js"></script>
+     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/af.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+<title>Search</title>   
+    <link rel="stylesheet" href="basic.css">
+</head>
+<body>
+    <header>
+        <div class="wrapper">
+       
+            <div class="logo">
+                <img src="images/logo.png">
+            </div>
+           <ul class ="nav-area">
+                    <li><a href="home.html">Home</a></li>
+                    <li><a href="search.html">Search Flight</a></li>
+					<li id='sigh'><a href="login.html">Login</a></li>
+                    <li><a href="my_compte.html">Account</a></li>
+                    <li id='deconnection'><button>Disconnect</button></li>
+                    
+                </ul>
+        </div>
+    </header>
+    
+    	
+    
+   
+    
+  <div id= "info-box">
+   <div id= "search-box">
+    <div id="login-box">
+    <br/>
+      <br/>
+      <br/>
+      <div class="left-box">
+      
+        <h1>Search for a flight</h1>
+       
+          <input  type="text" id="airport" placeholder="From..." />
+          <br/>
+          <br/>
+          <br/>
+          <input type="date" id="date" placeholder="Departure date"/> 
+          <br/>
+          <br/>
+          <br/>
+          <input type="submit" class="search" value="Search"/>
+          <br/><br/>&nbsp&nbsp&nbsp&nbsp  &nbsp&nbsp&nbsp&nbsp  &nbsp&nbsp&nbsp&nbsp  &nbsp&nbsp&nbsp&nbsp   &nbsp&nbsp&nbsp&nbsp  &nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp  &nbsp&nbsp&nbsp&nbsp  &nbsp&nbsp&nbsp&nbsp  &nbsp&nbsp&nbsp&nbsp  &nbsp&nbsp&nbsp&nbsp   &nbsp&nbsp&nbsp&nbsp 
+     &nbsp&nbsp&nbsp&nbsp <input type ="button" value="Back" style="width:80px" style="height:80px"  onclick="javascript:history.back()"/>
+       
+        
+        </div>
+      
+    
+    </div>
+    </div>
+    </div>
+  
+     
+          
+         
+        
+       
+            
+        
+        </div>
+</body>
+<script >
+
+
+$(document).ready(function () {
+	var username=sessionStorage.getItem('username');
+    var role=sessionStorage.getItem('status_login');
+    if(role!=null&&role!="null"){
+    	$("#sigh").hide();
+    	$('#deconnection').show();
+    	$('#welcome').html("Welcome "+username);
+    }else{
+    	$("#sigh").show();
+    	$('#deconnection').hide();
+    }
+    $('#deconnection').click(function () {
+    	sessionStorage.setItem('status_login',null);
+		sessionStorage.setItem('username',null);
+		location.href='home.html';
+    })
+})
+
+
+$(document).ready(function () {
+    var role=sessionStorage.getItem('status_login');
+	    if(role!=null){
+	    	$("#sigh").hide();
+	    	$('#deconnection').show();
+	    }else{
+	    	$("#sigh").show();
+	    	$('#deconnection').hide();
+	    }
+	    $('#deconnection').click(function () {
+	    	sessionStorage.setItem('status_login',null);
+			sessionStorage.setItem('username',null);
+			location.href='home.html';
+	    })
+    $('.search').click(function () {
+            var airport = $('#airport').val();
+            var date = $('#date').val();
+            var time = $('#time').val();
+            airport=airport.toLowerCase();
+            console.log(airport);
+            console.log(date);
+            console.log(time);
+             $.ajax({
+                 url: 'http://localhost:8080/ws/service/getFlight/'+date+'/'+airport,
+                 method: 'GET',
+                 data:{
+                	 'date': date,
+                	 'location': airport,
+                 },
+                 dataType: "json",
+                 success: function (data) {
+                    if(data.length>0){
+                    	alert('success! click to see your flights!');
+                        $('#airport').hide();
+                        var dataTable="<table id=\"table_id\" class=\"display\">\n" + 
+                        "    <thead>\n" + 
+                        "    <tr>\n" + 
+                        "        <br/>\n"+
+                        "        <th>id</th>\n" + 
+                        "        <th>Departure Date</th>\n" + 
+                        "		 <th>Departure location</th>\n" +
+                        "		 <th>Arrival location</th>\n" +
+                        "        <th>Departure Time</th>\n" +
+                        "        <th>Available Seats</th>\n" +
+                        "        <th>Price(euros)</th>\n" +
+                        " 		<th>Flight details</th>\n" +
+                        "    </tr>\n" + 
+                        "    </thead>\n" +
+                        "<tbody>\n"
+                    	for (var i=0;i<data.length;i++){
+                        	console.log(data[i]);
+                        	var obj=data[i];
+                        	var id=obj.id;
+                        	dataTable += "<tr>\n<td >"+obj.id+"</td>\n"+"<td>"+obj.departureDate+
+                        	"</td>\n"+"<td>"+obj.departureAirport.location+"</td>\n"+"<td>"+obj.arrivalAirport.location+"</td>\n"+"<td>"
+                        	+obj.departureTime+"</td>\n"+"<td>"+obj.availableSeat+"</td>\n"+"<td>"+obj.price+
+                        	"</td>\n<td><input type=\"button\" id=\"detail-button\" class=\"two\" value= \"Consult\" onclick=\"detail('"+id+"')\">"+
+                        	"</td>\n</tr>\n";
+                        }
+                        dataTable+="</tbody>\n</table>";
+                       $("#search-box").html("");
+                       $("#search-box").append(dataTable);
+                       $("#table_id").DataTable();
+                     
+                    }else{
+                    	 alert("Sorry, there is no flights matching your request.");
+                    }
+       
+              },
+                 error: function (error) {
+                     alert("Opps, no valide information, please try again.");
+                 }
+             });
+    });  
+})
+function detail(id){
+	sessionStorage.setItem('flight_id',id);
+	window.open('flight_info.html');
+  
+}
+</script>
+
+
+<style>
+   #login-box 
+{
+    position: relative;
+ 
+    height: 1000px;
+    width: 900px;
+     top: 100px;
+    left: 100px;
+ 
+   /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);*/
+    z-index:10;
+   opacity:0.8;
+   filter:alpha(opacity=150);
+}
+.left-box
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    padding: 40px;
+    width: 400px;
+    height: 400px; 
+    background-image: url(images/image1.jpg)
+}
+.table
+{
+	width : 50%;
+	text-align: center;
+ }
+h1
+{
+    margin: 0 0 20px 0;
+    font-weight: 300;
+    font-size: 28px;
+}
+/*
+input[type="text"],
+input[type="password"],
+input[type="date"]
+{
+    display: block;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    padding: 4px;
+    width: 220px;
+    height: 32px;
+    border: none;
+    outline: none;
+    border-bottom: 1px solid #aaa;
+    font-family: sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    transition: 0.2s ease;
+}
+*/
+input[type="submit"]
+{
+    margin-bottom: 28px;
+    width: 120px;
+    height: 32px;
+    background: #f44336;
+    border: none;
+    border-radius: 2px;
+    color: #fff;
+    font-family: sans-serif;
+    font-weight: 500;
+    text-transform: uppercase;
+    transition: 0.2s ease;
+    cursor: pointer;
+    
+}
+input[type="submit"]:hover,
+input[type="submit"]:focus
+{
+    background: #ff5722;
+    transition: 0.2s ease;
+}
+.or
+{
+    position: absolute;
+    top: 180px;
+    left: 280px;
+    width: 40px;
+    height: 40px;
+    background: #efefef;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6); 
+    line-height: 40px;
+    text-align: center;
+}
+.right-box .signinwith
+{
+    display: block;
+    margin-bottom: 40px;
+    font-size: 28px;
+    color: #fff;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+button.trip
+{
+    margin-bottom: 20px;
+    width: 220px;
+    height: 36px;
+    border: none;
+    border-radius: 2px;
+    color: #fff;
+    font-family: sans-serif;
+    font-weight: 500;
+    transition: 0.2s ease;
+    cursor: pointer;
+}
+.dataTables_wrapper {
+    position: relative;
+    clear: both;
+    *zoom: 1;
+    zoom: 1;
+    top: 80px;
+    width: 65%;
+    left: 250px;
+}
+.nav-area {
+    float: right;
+    list-style: none;
+    margin-top: 30px;
+    transform: translate(0%,0%);
+}
+:required {
+   border: 2px dotted orange;
+}
+  input{
+  border: double; 
+  outline: 0;
+  display: inline-block;
+  padding: 8px;
+  color: white;
+  background-color: rgb(3, 21, 31);
+  text-align: center;
+  cursor: pointer;
+  width: auto;
+  font-size: 18px;
+}
+button {
+	margin-bottom: 20px;
+	width: 220px;
+	height: 36px;
+	border: none;
+	border-radius: 2px;
+	color: #000;
+	font-family: sans-serif;
+	font-size:15px;
+	font-weight: 1000;
+	transition: 0.2s ease;
+	cursor: pointer;
+}
+</style> 
+</html>
